@@ -1,3 +1,5 @@
+use std::fmt::Result;
+
 
 // use std::collections::HashSet;
 fn main() {
@@ -6,7 +8,7 @@ fn main() {
     println!("{}", contents.len());
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
 pub struct Pos {
     x: i32,
     y: i32,
@@ -18,16 +20,60 @@ impl Pos {
     }
 }
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct IllegalChar(char);
+
+impl TryFrom<char> for Direction {
+    type Error = IllegalChar;
+
+    fn try_from(c:char) -> Result<Self, Self::Error> {
+        Ok(match c {
+            '^' => Self::North,
+            'v' => Self::South,
+            '<' => Self::West,
+            '>' => Self::East,
+            _ => return Err(IllegalChar(c)),
+        })
+    }
+}
+
+struct Moves{
+    moves: Vec<Direction>,
+}
+
+impl FromStr for Moves {
+    type Err = IllegalChar;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let result: Vec<Direction> = s
+            .chars()
+            .map(Direction::try_from)
+            .collect::<Result<Vec<Direction>, IllegalChar>>()?;
+        Ok (Moves { moves })
+    }
+}
+
 pub struct VisitedHouses {
-    // visited_houses: HashSet<Pos>,
-    // current_position: Pos,
+    visited_houses: HashSet<Pos>,
+    current_position: Pos,
 }
 
 impl VisitedHouses {
+    #[must_use]
     pub fn new() -> VisitedHouses {
         VisitedHouses {
-            // visited_houses: HashSet::new(),
-            // current_position: Pos::new(0, 0),
+            let initial_position = Pos::new(0, 0);
+            let mut visited_houses: HashSet<Pos> = HashSet::new();
+            visited_houses.insert(initial_position).clone();
+
         }
     }
 
@@ -37,6 +83,14 @@ impl VisitedHouses {
 
     pub fn current_pos(&self) -> Pos {
         Pos::new(0, 0)
+    }
+
+    pub fn perform_move()
+
+    pub fn perform_moves(&mut self, moves: Moves) {
+        for direction in moves.moves {
+            self.perform_move(direction);
+        }
     }
 }
 
@@ -63,7 +117,7 @@ mod tests {
     //     assert_eq!('v'.try_into(), Ok(Direction::South));
     //     assert_eq!('<'.try_into(), Ok(Direction::West));
     //     assert_eq!('>'.try_into(), Ok(Direction::East));
-    //     assert_eq!('x'.try_into(), Err(IllegalDirectionCharacter('x')));
+    //     assert_eq!(Direction::try_from('x'), Err(IllegalDirectionCharacter('x')));
     // }
 
     // #[test]
